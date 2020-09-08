@@ -26,7 +26,9 @@ class DashBoardView(context: Context?, attrs: AttributeSet?) : View(context, att
 
     private var mDash: Path = Path()
 
-    private var mPathDashPathEffect: PathDashPathEffect
+    private lateinit var mPathDashPathEffect: PathDashPathEffect
+
+    private lateinit var mRectF: RectF
 
     init {
         // 设置paint属性
@@ -36,18 +38,25 @@ class DashBoardView(context: Context?, attrs: AttributeSet?) : View(context, att
 
         // 设置dash的绘制区域
         mDash.addRect(0f, 0f, ScreenUtils.dp2Px(2f), ScreenUtils.dp2Px(10f), Path.Direction.CW)
+    }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+
+        mRectF = RectF(
+            measuredWidth / 2 - WIDTH / 2,
+            measuredHeight / 2 - HEIGHT / 2,
+            measuredWidth / 2 + WIDTH / 2,
+            measuredHeight / 2 + HEIGHT / 2
+        )
 
         val path = Path()
         path.addArc(
-            width / 2 - WIDTH / 2,
-            height / 2 - HEIGHT / 2,
-            width / 2 + WIDTH / 2,
-            height / 2 + HEIGHT / 2,
+            mRectF,
             (90 + ANGLE / 2),
             (360 - ANGLE)
         )
-
+        // 计算弧度的长度
         val pathMeasure = PathMeasure(path, false)
 
         mPathDashPathEffect = PathDashPathEffect(
@@ -59,23 +68,19 @@ class DashBoardView(context: Context?, attrs: AttributeSet?) : View(context, att
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
+        // 先绘制弧度
         canvas.drawArc(
-            width / 2 - WIDTH / 2,
-            height / 2 - HEIGHT / 2,
-            width / 2 + WIDTH / 2,
-            height / 2 + HEIGHT / 2,
+            mRectF,
             (90 + ANGLE / 2),
             (360 - ANGLE),
             false,
             mPaint
         )
-        mPaint.pathEffect = mPathDashPathEffect
 
+        // 绘制刻度
+        mPaint.pathEffect = mPathDashPathEffect
         canvas.drawArc(
-            width / 2 - WIDTH / 2,
-            height / 2 - HEIGHT / 2,
-            width / 2 + WIDTH / 2,
-            height / 2 + HEIGHT / 2,
+            mRectF,
             (90 + ANGLE / 2),
             (360 - ANGLE),
             false,
@@ -83,13 +88,13 @@ class DashBoardView(context: Context?, attrs: AttributeSet?) : View(context, att
         )
         mPaint.pathEffect = null
 
-        // 指针线
+        // 绘制指针
         mPaint.color = Color.RED
         canvas.drawLine(
             width / 2f,
             height / 2f,
-            (cos(Math.toRadians(getAngleForMark(4).toDouble())) * LENGTH).toFloat() + width / 2,
-            (sin(Math.toRadians(getAngleForMark(4).toDouble())) * LENGTH).toFloat() + height / 2,
+            (cos(Math.toRadians(getAngleForMark(4).toDouble())) * LENGTH).toFloat() + measuredWidth / 2,
+            (sin(Math.toRadians(getAngleForMark(4).toDouble())) * LENGTH).toFloat() + measuredHeight / 2,
             mPaint
         )
 
@@ -97,12 +102,15 @@ class DashBoardView(context: Context?, attrs: AttributeSet?) : View(context, att
         canvas.drawLine(
             width / 2f,
             height / 2f,
-            (cos(Math.toRadians(getAngleForMark(12).toDouble())) * LENGTH).toFloat() + width / 2,
-            (sin(Math.toRadians(getAngleForMark(12).toDouble())) * LENGTH).toFloat() + height / 2,
+            (cos(Math.toRadians(getAngleForMark(12).toDouble())) * LENGTH).toFloat() + measuredWidth / 2,
+            (sin(Math.toRadians(getAngleForMark(12).toDouble())) * LENGTH).toFloat() + measuredHeight / 2,
             mPaint
         )
     }
 
+    /**
+     * 从刻度转换为角度
+     */
     private fun getAngleForMark(mark: Int): Int {
         return (90 + ANGLE / 2 + (360 - ANGLE) / 20 * mark).toInt()
     }
