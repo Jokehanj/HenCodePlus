@@ -49,7 +49,7 @@ class SportsView(context: Context?, attrs: AttributeSet?) : View(context, attrs)
 
         canvas.drawText(
             "Hello World！",
-            (width / 2).toFloat(), height / 2 - fontMetrics.top - fontMetrics.bottom,
+            (width / 2).toFloat(), (height - fontMetrics.ascent - fontMetrics.descent) / 2,
             mPaint
         )
     }
