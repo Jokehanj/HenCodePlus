@@ -18,8 +18,10 @@ class CameraView(context: Context?, attrs: AttributeSet?) : View(context, attrs)
 
     private val WIDTH = ScreenUtils.dp2Px(150f)
     private val mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-
     private val mCamera = Camera()
+
+    private var mTopRotateX = 0f
+    private var mBottomRotateX = 30f
 
     private val mAvatarBitmap: Bitmap = BitmapUtils.getAvatar(
         WIDTH.toInt(),
@@ -28,21 +30,38 @@ class CameraView(context: Context?, attrs: AttributeSet?) : View(context, attrs)
     )
 
     init {
-        mCamera.rotateX(30f)
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
+
         canvas.save()
-
         canvas.translate((width / 2).toFloat(), (height / 2).toFloat())
-        mCamera.applyToCanvas(canvas)
-        canvas.translate(-WIDTH / 2, -WIDTH / 2)
 
+        mCamera.save()
+        mCamera.rotateX(mTopRotateX)
+        mCamera.applyToCanvas(canvas)
+        mCamera.restore()
+
+        canvas.translate(-WIDTH / 2, -WIDTH / 2)
+        canvas.clipRect(0f, 0f, WIDTH, WIDTH / 2)
+        canvas.drawBitmap(mAvatarBitmap, 0f, 0f, mPaint)
+        canvas.restore()
+
+        canvas.save()
+        canvas.translate((width / 2).toFloat(), (height / 2).toFloat())
+
+        mCamera.save()
+        mCamera.rotateX(mBottomRotateX)
+        mCamera.applyToCanvas(canvas)
+        mCamera.restore()
+
+        canvas.translate(-WIDTH / 2, -WIDTH / 2)
         canvas.clipRect(0f, WIDTH / 2, WIDTH, WIDTH)
         canvas.drawBitmap(mAvatarBitmap, 0f, 0f, mPaint)
         canvas.restore()
+
 
     }
 }
