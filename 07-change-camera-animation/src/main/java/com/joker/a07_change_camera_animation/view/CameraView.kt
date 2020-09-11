@@ -22,8 +22,21 @@ class CameraView(context: Context?, attrs: AttributeSet?) : View(context, attrs)
     private val mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val mCamera = Camera()
 
-    private var mTopRotateX = 0f
-    private var mBottomRotateX = 90f
+    var topRotateX = 0f
+        set(value) {
+            field = value
+            invalidate()
+        }
+    var bottomRotateX = 0f
+        set(value) {
+            field = value
+            invalidate()
+        }
+    var rotate = 0f
+        set(value) {
+            field = value
+            invalidate()
+        }
 
     private val mAvatarBitmap: Bitmap = BitmapUtils.getAvatar(
         WIDTH.toInt(),
@@ -41,15 +54,15 @@ class CameraView(context: Context?, attrs: AttributeSet?) : View(context, attrs)
         // 绘制顶部
         canvas.save()
         canvas.translate(MARGIN + WIDTH / 2, MARGIN + WIDTH / 2)
-        canvas.rotate(-20f)
+        canvas.rotate(-rotate)
 
         mCamera.save()
-        mCamera.rotateX(mTopRotateX)
+        mCamera.rotateX(topRotateX)
         mCamera.applyToCanvas(canvas)
         mCamera.restore()
 
         canvas.clipRect(-WIDTH, -WIDTH, WIDTH, 0f)
-        canvas.rotate(20f)
+        canvas.rotate(rotate)
         canvas.translate(-(MARGIN + WIDTH / 2), -(MARGIN + WIDTH / 2))
         canvas.drawBitmap(mAvatarBitmap, MARGIN, MARGIN, mPaint)
         canvas.restore()
@@ -57,15 +70,15 @@ class CameraView(context: Context?, attrs: AttributeSet?) : View(context, attrs)
         // 绘制底部
         canvas.save()
         canvas.translate(MARGIN + WIDTH / 2, MARGIN + WIDTH / 2)
-        canvas.rotate(-20f)
+        canvas.rotate(-rotate)
 
         mCamera.save()
-        mCamera.rotateX(mBottomRotateX)
+        mCamera.rotateX(bottomRotateX)
         mCamera.applyToCanvas(canvas)
         mCamera.restore()
 
         canvas.clipRect(-WIDTH, 0f, WIDTH, WIDTH)
-        canvas.rotate(20f)
+        canvas.rotate(rotate)
         canvas.translate(-(MARGIN + WIDTH / 2), -(MARGIN + WIDTH / 2))
         canvas.drawBitmap(mAvatarBitmap, MARGIN, MARGIN, mPaint)
         canvas.restore()
