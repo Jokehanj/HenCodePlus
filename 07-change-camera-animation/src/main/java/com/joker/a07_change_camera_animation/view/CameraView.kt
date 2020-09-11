@@ -1,6 +1,7 @@
 package com.joker.a07_change_camera_animation.view
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Camera
 import android.graphics.Canvas
@@ -16,12 +17,13 @@ import com.joker.commend_unils.ScreenUtils
  */
 class CameraView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
-    private val WIDTH = ScreenUtils.dp2Px(150f)
+    private val MARGIN = ScreenUtils.dp2Px(100f)
+    private val WIDTH = ScreenUtils.dp2Px(200f)
     private val mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val mCamera = Camera()
 
     private var mTopRotateX = 0f
-    private var mBottomRotateX = 30f
+    private var mBottomRotateX = 90f
 
     private val mAvatarBitmap: Bitmap = BitmapUtils.getAvatar(
         WIDTH.toInt(),
@@ -30,38 +32,46 @@ class CameraView(context: Context?, attrs: AttributeSet?) : View(context, attrs)
     )
 
     init {
+        mCamera.setLocation(0f, 0f, getZForCamera())
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-
+        // 绘制顶部
         canvas.save()
-        canvas.translate((width / 2).toFloat(), (height / 2).toFloat())
+        canvas.translate(MARGIN + WIDTH / 2, MARGIN + WIDTH / 2)
+        canvas.rotate(-20f)
 
         mCamera.save()
         mCamera.rotateX(mTopRotateX)
         mCamera.applyToCanvas(canvas)
         mCamera.restore()
 
-        canvas.translate(-WIDTH / 2, -WIDTH / 2)
-        canvas.clipRect(0f, 0f, WIDTH, WIDTH / 2)
-        canvas.drawBitmap(mAvatarBitmap, 0f, 0f, mPaint)
+        canvas.clipRect(-WIDTH, -WIDTH, WIDTH, 0f)
+        canvas.rotate(20f)
+        canvas.translate(-(MARGIN + WIDTH / 2), -(MARGIN + WIDTH / 2))
+        canvas.drawBitmap(mAvatarBitmap, MARGIN, MARGIN, mPaint)
         canvas.restore()
 
+        // 绘制底部
         canvas.save()
-        canvas.translate((width / 2).toFloat(), (height / 2).toFloat())
+        canvas.translate(MARGIN + WIDTH / 2, MARGIN + WIDTH / 2)
+        canvas.rotate(-20f)
 
         mCamera.save()
         mCamera.rotateX(mBottomRotateX)
         mCamera.applyToCanvas(canvas)
         mCamera.restore()
 
-        canvas.translate(-WIDTH / 2, -WIDTH / 2)
-        canvas.clipRect(0f, WIDTH / 2, WIDTH, WIDTH)
-        canvas.drawBitmap(mAvatarBitmap, 0f, 0f, mPaint)
+        canvas.clipRect(-WIDTH, 0f, WIDTH, WIDTH)
+        canvas.rotate(20f)
+        canvas.translate(-(MARGIN + WIDTH / 2), -(MARGIN + WIDTH / 2))
+        canvas.drawBitmap(mAvatarBitmap, MARGIN, MARGIN, mPaint)
         canvas.restore()
+    }
 
-
+    private fun getZForCamera(): Float {
+        return -6 * Resources.getSystem().displayMetrics.density
     }
 }
